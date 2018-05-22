@@ -1,18 +1,18 @@
 /*
  * Command Interface: <CommandSet>
  * Command Set: strings for CMD and PARAMETERS
- *  Stepper Motor Set Speed:  <stepspeed [motor# 1-M1M2/2-M3M4] [speed]
- *  Stepper Motor Move:       <stepper [motor#] [steps] [F-Forward/B-Backward] [S-Single/D-Double/I-Interleave/M-Microstep]
- *  Stepper Motor Release:    <steprel [motor#]
+ *  Stepper Motor Set Speed:  <stepspeed [motor# 1-M1M2/2-M3M4] [speed]>
+ *  Stepper Motor Move:       <stepper [motor#] [steps] [F-Forward/B-Backward] [S-Single/D-Double/I-Interleave/M-Microstep]>
+ *  Stepper Motor Release:    <steprel [motor#]>
+ *  Enable/Disable Touch Sensor:<touch 0-disable 1-enable>
  * Example Stepper Commands: 
 <stepspeed 1 100>
 <stepper 1 1000 F S>
 <steprel 1>
  * 
  */
-
-#include <Wire.h>
 #include <Adafruit_MotorShield.h>
+#include <Wire.h>
 #include <string.h>
  
 const byte numChars = 100;
@@ -31,8 +31,20 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *motor1 = AFMS.getStepper(200, 1);
 Adafruit_StepperMotor *motor2 = AFMS.getStepper(200, 2);
 
+boolean enableTouchSensor = true;
+const int M1FTouch = 2;
+const int M1BTouch = 3;
+const int M2FTouch = 4;
+const int M2BTouch = 5;
+const int SEG_STEPS = 10;
+
 void setup() {
   // put your setup code here, to run once:
+  pinMode(M1FTouch, INPUT);
+  pinMode(M1BTouch, INPUT);
+  pinMode(M2FTouch, INPUT);
+  pinMode(M2BTouch, INPUT);
+  
   Serial.begin(9600);
   Serial.println("<Arduino is ready>");
 
@@ -73,10 +85,28 @@ void parseCommand() {
         Serial.print( " "  );
         Serial.println( String(style) );
 
+        int segs = steps.toInt() / SEG_STEPS;
+        int remsteps = steps.toInt() % SEG_STEPS;
+
+        for(int i=0; i<segs; i++) {
+          if( motor.toInt() == 1 ) {
+            int state = checkState(1, dir);
+            if(state != HIGH)
+              motor1->step(SEG_STEPS, dir, style);
+          } else {
+            int state = checkState(2, dir);
+            if(state != HIGH)
+              motor2->step(SEG_STEPS, dir, style);
+          }
+        }
         if( motor.toInt() == 1 ) {
-          motor1->step(steps.toInt(), dir, style);
+          int state = checkState(1, dir);
+          if(state != HIGH)
+            motor1->step(remsteps, dir, style);
         } else {
-          motor2->step(steps.toInt(), dir, style);
+          int state = checkState(2, dir);
+          if(state != HIGH)
+            motor2->step(remsteps, dir, style);
         }
      } else if(strcmp(cmd[0], "stepspeed") == 0) {
         String motor(cmd[1]);
@@ -95,10 +125,41 @@ void parseCommand() {
         } else {
           motor2->release();
         }
+     } else if(strcmp(cmd[0], "touch") == 0) {
+        String val(cmd[1]);
+      
+        if( val.toInt() == 1 ) {
+          enableTouchSensor = true;
+        } else {
+          enableTouchSensor = false;
+        }
      }
   }
   argc = 0;
   //Serial.flush();
+}
+
+int checkState(int motor, int dir) 
+{
+  int state = LOW;
+  if(enableTouchSensor)  {
+    if( motor == 1 ) {
+      if(dir == FORWARD) {
+        state = digitalRead(M1FTouch);
+      } else {
+        state = digitalRead(M1BTouch);
+      }
+    } else {
+      if(dir == FORWARD) {
+        state = digitalRead(M2FTouch);
+      } else {
+        state = digitalRead(M2BTouch);
+      }
+    }
+    Serial.print( "Read State: " );
+    Serial.println( String(state) );
+  }
+  return state;
 }
 
 void readCommand() {
