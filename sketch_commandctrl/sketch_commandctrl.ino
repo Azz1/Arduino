@@ -31,7 +31,7 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_StepperMotor *motor1 = AFMS.getStepper(200, 1);
 Adafruit_StepperMotor *motor2 = AFMS.getStepper(200, 2);
 
-boolean enableTouchSensor = true;
+boolean enableTouchSensor = false;
 const int M1FTouch = 2;
 const int M1BTouch = 3;
 const int M2FTouch = 4;
