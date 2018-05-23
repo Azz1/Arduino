@@ -93,10 +93,14 @@ void parseCommand() {
             int state = checkState(1, dir);
             if(state != HIGH)
               motor1->step(SEG_STEPS, dir, style);
+            else
+              break;
           } else {
             int state = checkState(2, dir);
             if(state != HIGH)
               motor2->step(SEG_STEPS, dir, style);
+            else
+              break;
           }
         }
         if( motor.toInt() == 1 ) {
@@ -156,8 +160,15 @@ int checkState(int motor, int dir)
         state = digitalRead(M2BTouch);
       }
     }
-    Serial.print( "Read State: " );
-    Serial.println( String(state) );
+    if( state == HIGH ) {
+      Serial.print( "Reached Limit: [" );
+      Serial.print( String(motor) );
+      Serial.print( "," );
+      Serial.print( String(dir) );
+      Serial.print( "," );
+      Serial.print( String(state) );
+      Serial.println( "]" );
+    }
   }
   return state;
 }
