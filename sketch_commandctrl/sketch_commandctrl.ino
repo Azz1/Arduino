@@ -28,7 +28,8 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Connect a stepper motor with 200 steps per revolution (1.8 degree)
 // to motor port #2 (M3 and M4)
-Adafruit_StepperMotor *motor1 = AFMS.getStepper(200, 1);
+Adafruit_StepperMotor *motor1 = AFMS.getStepper(1, 1);  // set steps to 1 for Microstep only for speed control: 
+                                                            //    speed 1-10 60s/r, 20 36s/r, 40 50s/r, 50 43s/r, 100 28s/r, 200 20s/r, max 13s/r
 Adafruit_StepperMotor *motor2 = AFMS.getStepper(200, 2);
 
 boolean enableTouchSensor = false;
