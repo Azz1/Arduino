@@ -310,12 +310,23 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
     ret = onestep(dir, style);
 	
     //The largest value that will produce an accurate delay is 16383. call multiple times to get more delay
+/*
     int n = uspers / 16383;
     uint32_t remain =  uspers % 16383;
     do {
        delayMicroseconds(remain);
        n --;
     } while( n >= 0 );
+*/
+
+    delayMicroseconds(uspers);
+    if (style == MICROSTEP) {
+	 delayMicroseconds(uspers);
+	 delayMicroseconds(uspers);
+	 delayMicroseconds(uspers);
+	 delayMicroseconds(uspers);
+	 delayMicroseconds(uspers);
+    }
 	  
 #ifdef ESP8266
     yield(); // required for ESP8266
