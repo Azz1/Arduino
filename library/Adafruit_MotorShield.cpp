@@ -251,6 +251,7 @@ void Adafruit_DCMotor::setSpeed(uint8_t speed) {
 /**************************************************************************/
 Adafruit_StepperMotor::Adafruit_StepperMotor(void) {
   revsteps = steppernum = currentstep = 0;
+  microadj = 0;
 }
 
 
@@ -265,6 +266,11 @@ void Adafruit_StepperMotor::setSpeed(uint16_t rpm) {
   //Serial.println("RPM: "); Serial.println(rpm);
 
   usperstep = 60000000 / ((uint32_t)revsteps * (uint32_t)rpm);
+}
+
+void Adafruit_StepperMotor::setMicroAdj(long madj) {
+
+  microadj = madj;
 }
 
 /**************************************************************************/
@@ -311,22 +317,32 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
 	
     //The largest value that will produce an accurate delay is 16383. call multiple times to get more delay
 /*
-    int n = uspers / 16383;
-    uint32_t remain =  uspers % 16383;
-    do {
-       delayMicroseconds(remain);
-       n --;
-    } while( n >= 0 );
+  Method 1
 */
-
+	if (style == MICROSTEP) {
+      int n = (uspers + microadj) / 16383;
+      uint32_t remain =  (uspers + microadj) % 16383;
+      while( n > 0 ) {
+       delayMicroseconds(16383);
+       n --;
+      }
+      delayMicroseconds(remain);
+	} else {
+      delayMicroseconds(uspers);
+	}
+	
+/*	
+  Method 2
+  
     delayMicroseconds(uspers);
     if (style == MICROSTEP) {
-	 delayMicroseconds(uspers);
-	 delayMicroseconds(uspers);
-	 delayMicroseconds(uspers);
-	 delayMicroseconds(uspers);
-	 delayMicroseconds(uspers);
+	 delayMicroseconds(uspers + microadj/5);
+	 delayMicroseconds(uspers + microadj/5);
+	 delayMicroseconds(uspers + microadj/5);
+	 delayMicroseconds(uspers + microadj/5);
+	 delayMicroseconds(uspers + microadj/5);
     }
+*/
 	  
 #ifdef ESP8266
     yield(); // required for ESP8266

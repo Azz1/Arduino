@@ -1,7 +1,9 @@
+#include <Adafruit_MotorShield.h>
+
 /*
  * Command Interface: <CommandSet>
  * Command Set: strings for CMD and PARAMETERS
- *  Stepper Motor Set Speed:  <stepspeed [motor# 1-M1M2/2-M3M4] [speed]>
+ *  Stepper Motor Set Speed:  <stepspeed [motor# 1-M1M2/2-M3M4] [speed] [microadj]>
  *  Stepper Motor Move:       <stepper [motor#] [steps] [F-Forward/B-Backward] [S-Single/D-Double/I-Interleave/M-Microstep]>
  *  Stepper Motor Release:    <steprel [motor#]>
  *  Enable/Disable Touch Sensor:<touch 0-disable 1-enable>
@@ -115,12 +117,18 @@ void parseCommand() {
         }
      } else if(strcmp(cmd[0], "stepspeed") == 0) {
         String motor(cmd[1]);
-        String speed(cmd[2]);
+        String speed(cmd[2]);     
+        String microadj("0");
+        if( argc >= 3 ) {
+          microadj = String(cmd[3]);
+        }
       
         if( motor.toInt() == 1 ) {
           motor1->setSpeed(speed.toInt());
+          motor1->setMicroAdj(microadj.toInt());
         } else {
           motor2->setSpeed(speed.toInt());
+          motor2->setMicroAdj(microadj.toInt());
         }
      } else if(strcmp(cmd[0], "steprel") == 0) {
         String motor(cmd[1]);

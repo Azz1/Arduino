@@ -68,6 +68,7 @@ class Adafruit_StepperMotor {
  public:
   Adafruit_StepperMotor(void);
   void setSpeed(uint16_t);
+  void setMicroAdj(long);
 
   void step(uint16_t steps, uint8_t dir,  uint8_t style = SINGLE);
   uint8_t onestep(uint8_t dir, uint8_t style);
@@ -77,6 +78,7 @@ class Adafruit_StepperMotor {
 
  private:
   uint32_t usperstep;
+  long microadj;
 
   uint8_t PWMApin, AIN1pin, AIN2pin;
   uint8_t PWMBpin, BIN1pin, BIN2pin;
