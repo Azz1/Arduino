@@ -314,7 +314,7 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
   while (steps--) {
     //Serial.println("step!"); Serial.println(uspers);
     ret = onestep(dir, style);
-	
+		
     //The largest value that will produce an accurate delay is 16383. call multiple times to get more delay
 /*
   Method 1
@@ -323,7 +323,10 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
       int n = (uspers + microadj) / 16383;
       uint32_t remain =  (uspers + microadj) % 16383;
       while( n > 0 ) {
-       delayMicroseconds(16383);
+	   
+	   if(Serial.available() > 0) break;
+       
+	   delayMicroseconds(16383);
        n --;
       }
       delayMicroseconds(remain);
@@ -343,6 +346,8 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
 	 delayMicroseconds(uspers + microadj/5);
     }
 */
+
+	if(Serial.available() > 0) break;
 	  
 #ifdef ESP8266
     yield(); // required for ESP8266
