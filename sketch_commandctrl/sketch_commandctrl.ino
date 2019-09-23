@@ -110,10 +110,14 @@ void parseCommand() {
           int state = checkState(1, dir);
           if(state != HIGH)
             motor1->step(remsteps, dir, style);
+            
+          motor1->release();
         } else {
           int state = checkState(2, dir);
           if(state != HIGH)
             motor2->step(remsteps, dir, style);
+          
+          motor2->release();
         }
      } else if(strcmp(cmd[0], "stepspeed") == 0) {
         String motor(cmd[1]);
@@ -149,13 +153,16 @@ void parseCommand() {
      }
   }
   argc = 0;
-  //Serial.flush();
 }
 
 int checkState(int motor, int dir) 
 {
   int state = LOW;
-  if(enableTouchSensor)  {
+
+  recvWithStartEndMarkers();
+  if (newData == true && strncmp(receivedChars,"stepspeed", 9) == 0) state = HIGH;  // check the first command in the sequence
+    
+  if(state == LOW && enableTouchSensor)  {
     if( motor == 1 ) {
       if(dir == FORWARD) {
         state = digitalRead(M1FTouch);
@@ -229,6 +236,7 @@ void recvWithStartEndMarkers() {
             recvInProgress = true;
         }
     }
+    //Serial.flush();
 }
 
 void echo() {

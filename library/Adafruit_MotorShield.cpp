@@ -287,6 +287,7 @@ void Adafruit_StepperMotor::release(void) {
   MC->setPWM(PWMBpin, 0);
 }
 
+
 /**************************************************************************/
 /*!
     @brief  Move the stepper motor with the given RPM speed, don't forget to call
@@ -323,9 +324,6 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
       int n = (uspers + microadj) / 16383;
       uint32_t remain =  (uspers + microadj) % 16383;
       while( n > 0 ) {
-	   
-	   if(Serial.available() > 0) break;
-       
 	   delayMicroseconds(16383);
        n --;
       }
@@ -346,8 +344,6 @@ void Adafruit_StepperMotor::step(uint16_t steps, uint8_t dir,  uint8_t style) {
 	 delayMicroseconds(uspers + microadj/5);
     }
 */
-
-	if(Serial.available() > 0) break;
 	  
 #ifdef ESP8266
     yield(); // required for ESP8266
