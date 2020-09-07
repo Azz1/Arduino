@@ -160,7 +160,8 @@ int checkState(int motor, int dir)
   int state = LOW;
 
   recvWithStartEndMarkers();
-  if (newData == true && strncmp(receivedChars,"stepspeed", 9) == 0) state = HIGH;  // check the first command in the sequence
+  //if (newData == true && strncmp(receivedChars,"stepspeed", 9) == 0) state = HIGH;  // check the first command in the sequence
+  if (newData == true) state = HIGH;  // check if there is command in the sequence
     
   if(state == LOW && enableTouchSensor)  {
     if( motor == 1 ) {
